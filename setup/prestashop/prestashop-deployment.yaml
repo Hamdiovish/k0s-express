@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prestashop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prestashop
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: prestashop
+    spec:
+      initContainers:
+      - name: init-storage
+        image: busybox:1.28
+        command: ["sh", "-c", "mkdir -p /bitnami && chmod -R 777 /bitnami"]
+        volumeMounts:
+        - name: presta-prestashop-persistent-storage
+          mountPath: /bitnami
+      containers:
+      - env:
+        - name: PRESTASHOP_HOST
+          value: "localhost:40003"
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        - name: PRESTASHOP_DATABASE_HOST
+          value: mariadb
+        - name: PRESTASHOP_DATABASE_PORT_NUMBER
+          value: "3306"
+        - name: PRESTASHOP_DATABASE_NAME
+          value: bitnami_prestashop
+        - name: PRESTASHOP_DATABASE_USER
+          value: bn_prestashop
+        image: docker.io/bitnami/prestashop:1.7.8-6-debian-11-r11
+        name: prestashop
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: presta-prestashop-persistent-storage
+          mountPath: /bitnami
+      volumes:
+      - name: presta-prestashop-persistent-storage
+        persistentVolumeClaim:
+          claimName: pvc-02
+      restartPolicy: Always

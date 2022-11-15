@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sample-app-with-pvc
+  labels:
+    app: sample-app-with-pvc
+spec:
+  containers:
+    - name: sample-app
+      image: karthequian/helloworld:latest
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - mountPath: "/app"
+          name: sample-volume-mount
+  volumes:
+    - name: sample-volume-mount
+      persistentVolumeClaim:
+        claimName: pvc-01

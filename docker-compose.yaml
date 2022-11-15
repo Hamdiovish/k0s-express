@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  k0s:
+    container_name: k0s
+    image: docker.io/k0sproject/k0s:latest
+    command: k0s controller --config=/etc/k0s/k0s.yaml  --single --enable-worker
+    hostname: k0s
+    privileged: true
+    restart: always
+    volumes:
+      - "./infra/config/k0s.yaml:/etc/k0s/k0s.yaml"
+      - "/mnt/k0s/storage"
+      - "/var/lib/k0s"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2048M
+        reservations:
+          cpus: '1'
+          memory: 1024M
+    ports:
+      - "6443:6443"
+      - "40000-40010:40000-40010"

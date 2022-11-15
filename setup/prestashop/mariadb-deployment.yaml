@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      initContainers:
+      - name: init-storage
+        image: busybox:1.28
+        command: ["sh", "-c", "mkdir -p /bitnami && chmod -R 777 /bitnami"]
+        volumeMounts:
+        - name: presta-mariadb-persistent-storage
+          mountPath: /bitnami
+      containers:
+      - env:
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        - name: MARIADB_DATABASE
+          value: bitnami_prestashop
+        - name: MARIADB_USER
+          value: bn_prestashop
+        image: docker.io/bitnami/mariadb:10.6.8-debian-11-r9
+        name: mariadb
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: presta-mariadb-persistent-storage
+          mountPath: /bitnami
+      volumes:
+      - name: presta-mariadb-persistent-storage
+        persistentVolumeClaim:
+          claimName: pvc-02
+      restartPolicy: Always
+status: {}

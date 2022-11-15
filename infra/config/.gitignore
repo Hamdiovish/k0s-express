@@ -1,0 +1,7 @@
+# Ignore everything in this directory
+*
+# Except this file
+!k0s.yaml
+!daemon.json
+!containerd.toml
+!.gitignore
